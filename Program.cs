@@ -254,9 +254,9 @@ namespace AsciiArtBannerTool
             }
         };
 
-        static void Main(string[] args)
+       static void Main(string[] args)
 {
-    // Configure Spectre.Console (initial banner display)
+    // Initial banner display (one-time)
     AnsiConsole.MarkupLine("[bold cyan]╔══════════════════════════════════════════════════════════════════════╗[/]");
     AnsiConsole.MarkupLine("[bold cyan]║[/]                                                              [bold cyan]║[/]");
     AnsiConsole.MarkupLine("[bold cyan]║[/] [bold yellow]███████╗██╗███╗   ██╗██╗  ██╗███████╗███╗   ██╗███████╗████████╗[/]");
@@ -279,57 +279,54 @@ namespace AsciiArtBannerTool
     AnsiConsole.MarkupLine("[bold green]📝 About:[/]");
     AnsiConsole.MarkupLine("[dim white]Cool ASCII art banner generator that automatically strips 's' letters from your input text.[/]");
     AnsiConsole.MarkupLine("");
-    AnsiConsole.MarkupLine("[bold green]Type 'n' to exit after each generation.[/]");
+    AnsiConsole.MarkupLine("[bold green]Press 'y' to generate another banner after each one, or 'n' to exit.[/]");
     AnsiConsole.MarkupLine("");
 
     // Main loop: Repeat until user chooses to exit
     while (true)
-{
-    var prompt = AnsiConsole.Prompt(
-        new TextPrompt<string>("[bold magenta]✏️  Enter your text to generate banner:[/]")
-            .PromptStyle("bold magenta")
-            .Validate(text => !string.IsNullOrWhiteSpace(text))
-    );
-
-    var processedText = StripLetters(prompt.ToUpper());
-    var banner = GenerateBanner(processedText);
-
-    DisplayRainbowBanner(banner);
-
-    AnsiConsole.MarkupLine("");
-    AnsiConsole.MarkupLine("[bold green]🎉 Banner generated successfully![/]");
-    AnsiConsole.MarkupLine("[dim yellow]Original text:[/]");
-    AnsiConsole.MarkupLine($"[dim white]{Markup.Escape(prompt)}[/]");
-    AnsiConsole.MarkupLine("[dim yellow]Processed text (without 's' letters):[/]");
-    AnsiConsole.MarkupLine($"[dim white]{Markup.Escape(processedText)}[/]");
-                AnsiConsole.MarkupLine("");
-
-    // Ask confirmation to continue
-    var confirmationPrompt = new ConfirmationPrompt("Generate another banner?");
-    confirmationPrompt.DefaultValue = true;
-    confirmationPrompt.ShowChoices = true;
-    confirmationPrompt.Yes = 'y';
-    confirmationPrompt.No = 'n';
-
-var continueGenerating = AnsiConsole.Prompt(confirmationPrompt);
-
-    var continueGenerating = AnsiConsole.Prompt(
-        new ConfirmationPrompt("[bold cyan]Generate another banner?[/]")
-            .DefaultValue(true)  // Default is yes
-            .ShowChoices()
-            .Yes('y')
-            .No('n')
-    );
-
-    if (!continueGenerating)
     {
-        AnsiConsole.MarkupLine("[bold green]👋 Thanks for using ASCIIGenSharp! Goodbye![/]");
-        break;
+        // Get input from user
+        var prompt = AnsiConsole.Prompt(
+            new TextPrompt<string>("[bold magenta]✏️  Enter your text to generate banner:[/]")
+                .PromptStyle("bold magenta")
+                .Validate(text => !string.IsNullOrWhiteSpace(text))
+        );
+
+        // Process the input
+        var processedText = StripLetters(prompt.ToUpper());
+        var banner = GenerateBanner(processedText);
+
+        // Display the result with plain white text
+        DisplayRainbowBanner(banner);
+
+        // Success message
+        AnsiConsole.MarkupLine("");
+        AnsiConsole.MarkupLine("[bold green]🎉 Banner generated successfully![/]");
+        AnsiConsole.MarkupLine("[dim yellow]Original text:[/]");
+        AnsiConsole.MarkupLine($"[dim white]{Markup.Escape(prompt)}[/]");
+        AnsiConsole.MarkupLine("[dim yellow]Processed text (without 's' letters):[/]");
+        AnsiConsole.MarkupLine($"[dim white]{Markup.Escape(processedText)}[/]");
+        AnsiConsole.MarkupLine("");
+
+        // Confirmation to continue (correct property syntax)
+        var confirmationPrompt = new ConfirmationPrompt("[bold cyan]Generate another banner? [y/n][/]");
+        confirmationPrompt.DefaultValue = true;  // Default to yes
+        confirmationPrompt.ShowChoices = true;    // Show [y/n] options
+        confirmationPrompt.ShowDefaultValue = true;
+        confirmationPrompt.Yes = 'y';            // Yes character
+        confirmationPrompt.No = 'n';             // No character
+        confirmationPrompt.DefaultValueStyle = new Style(Color.Green);  // Style for default 'yes'
+
+        var continueGenerating = AnsiConsole.Prompt(confirmationPrompt);
+
+        if (!continueGenerating)
+        {
+            AnsiConsole.MarkupLine("[bold green]👋 Thanks for using ASCIIGenSharp![/]");
+            break;  // Exit the loop
+        }
+
+        AnsiConsole.MarkupLine("");  // Spacing before next iteration
     }
-
-    AnsiConsole.MarkupLine("");
-}
-
 }
 
         static string StripLetters(string input)
